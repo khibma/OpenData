@@ -33,7 +33,7 @@ csv = od.findGroups(localPath)
 
 
 # List all the items in a folder
-foldItems  =od.listItemsByFolder("Unnecessary")
+foldItems = od.listItemsByFolder("Unnecessary")
 print("{} items in {}".format(len(foldItems), "Unnecessary"))
 print("Title, ItemURL, ServerURL")
 for fi in foldItems:        
@@ -92,3 +92,14 @@ for ai in auditItems:
         print("{} : {}".format(ai['title'], report))
 print("Audit: {} services".format(len(auditItems)))
 
+
+# Update an item
+# This sample grabs the first item in the given folder and simply touches it. The modified date on Portal is updated.
+# Logic to update items that have actually had their data updated needs to be applied.
+# This function is used as the data powering the ArcGIS Server services is updated without the Portal items knowledge, thus
+#  this will be called by the process updating the actual data, so the item's last modified is current.
+foldItems = od.listItemsByFolder("Unnecessary")
+anItem = foldItems[0]
+print("item: {}, created: {}, modified: {}".format(anItem.title, od.convertDate(anItem.created), od.convertDate(anItem.modified)))
+updatedItem = od.touchUpdate(anItem)
+print(updatedItem)

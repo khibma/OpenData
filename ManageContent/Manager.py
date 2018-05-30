@@ -4,6 +4,7 @@ import configparser
 import os
 import csv
 import sys
+import datetime
 
 class ODManager(object):
 
@@ -16,6 +17,13 @@ class ODManager(object):
         self.me = self.gis.users.me
         self.folders = self.me.folders
         self.groups = self.gis.groups.search("owner:{}".format(self.username))
+
+    def convertDate(self, adate):
+        ''' Convert Epoch into human readable date '''
+        fmt = "%Y-%m-%d %H:%M:%S"
+        t = datetime.datetime.fromtimestamp(float(adate)/1000.)
+        #t_utc = datetime.datetime.utcfromtimestamp(float(adate)/1000.)        
+        return t.strftime(fmt) 
 
 
     def findGroups(self, outputPath=None):
@@ -93,11 +101,13 @@ class ODManager(object):
         return doesPass, report
 
     def touchUpdate(self, agolitem):
-        ''' Simply touches an item on portal, forcing the 'updated date' to refresh '''
+        ''' Simply touches an item on portal, forcing the 'updated date' to refresh
+            This function could be enhanced to accept a metadata payload for metadata edits
+         '''
 
-        agolitem.update()
+        result = agolitem.update()
 
-        return
+        return result
 
 
 if __name__ == "__main__":
