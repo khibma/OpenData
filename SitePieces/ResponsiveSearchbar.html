@@ -1,0 +1,39 @@
+<! -- This sample creates a longer search bar, styles the search button and places the
+  secondary text below the search bar. It also shrinks the search bar and stops the button/text
+  from overlapping when viewed on a mobile device. 425px was deemed the appropraite value to switch.
+  Insert a banner card and text card. Fill out the banner card boxes via the widget controls. Add
+  the below style/code to the text box. A "Browse all data" button is also provided.
+  Note, this builds off the search bar sample at: https://hub.arcgis.com/pages/site-customization
+-->
+
+<style>
+@media only screen and (max-device-width : 425px) {
+ .ember-application .jumbotron p { color:#ffffff; bottom: 0; font-size:24px; text-align: center;  left: 0; right:0; text-shadow: 2px 2px #000000;}
+ .ember-application .jumbotron form input {width:180px; border-radius: 4px;}
+}
+@media only screen and (min-device-width: 426px) {
+ .ember-application .jumbotron p { position: absolute; color:#ffffff; bottom: 0; font-size:24px; text-align: center;  left: 0; right:0; text-shadow: 2px 2px #000000;}
+.ember-application .jumbotron form input {width:400px; border-radius: 4px;}
+}
+
+h2.single-sb-heading {margin-top: 0px; padding: 0px; font-size: 28px; color: #ffffff;}
+.ember-application .jumbotron .btn {font-size:20px; background-color:#002B7F; }
+.ember-application .jumbotron .btn:hover {color:#009B7F;}
+.ember-application .jumbotron {padding: 0px auto; margin: 0px auto;}
+.ember-application .jumbotron h1 {font-size: 62px;text-shadow: 4px 4px #000000;  font-weight: bold;}
+</style>
+
+<style>
+.btn.btn-primary {
+	border-radius: 24px;
+}
+.btn.btn-default.open-btn{
+  border-radius: 24px;
+}
+.btn.btn-primary.btn-search {
+  border-radius: 4px;
+  border-color: #011a4e;
+}
+</style>
+
+<p class=text-center> <a href="/datasets?sort=name" class="btn btn-primary">Browse all content</a></p>
