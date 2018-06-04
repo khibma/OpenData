@@ -119,3 +119,11 @@ for w in wrong.content():
         print(w['title'])
         w.unshare(groups="abcdefg456")
         w.share(groups="zzzz123")
+
+# Move all the items in the "Ready" folder to the final home of Open Data
+# Also share items live to the public
+itemsToShare = od.listItemsByFolder("Ready_FR")
+for i in itemsToShare:
+    print(i['title'])
+    i.share(everyone=True)
+    i.move("Data_FR")
