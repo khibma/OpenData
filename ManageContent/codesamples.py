@@ -22,6 +22,9 @@ portal = config['auth']['agol']
 
 od = ODManager(user, pword, portal, localPath)
 
+# Get and display all folders
+for f in od.folders:
+    print("{} - {}".format(f['title'], f['id']))
 
 # Get and display all groups
 grps = od.findGroups()
@@ -31,7 +34,6 @@ for g in grps:
 # Save all the groups from the logged in user to a CSV
 csv = od.findGroups(localPath)
 
-
 # List all the items in a folder
 foldItems = od.listItemsByFolder("Unnecessary")
 print("{} items in {}".format(len(foldItems), "Unnecessary"))
@@ -40,7 +42,7 @@ for fi in foldItems:
     print("{}, {}, {}".format(fi.title, fi.homepage, fi.url))   
 
 
-# Move items from one folder to another, based on a sistem item existing in a similiar folder.
+# Move items from one folder to another, based on a sister item existing in a similiar folder.
 # Specifically, some ENGLISH items have been moved to "Unnecessary"
 #  We need to identify the French items that live in "_stagingFR" and move them to "Unnecessary_FR"
 un_en = od.listItemsByFolder("Unnecessary")
@@ -82,16 +84,14 @@ for itm in gcontent:
     if itm.access != "public":
         print("  {} : {}".format(itm.title, itm.access))    
 
-
 # Perform a metadata audit by all items in a folder.
 # If the item does not have a value, its report as a failure.
-auditItems = od.listItemsByFolder("ToBeReviewed_EN")
+auditItems = od.listItemsByFolder("Ready_EN")
 for ai in auditItems:
-    success, report = od.audit(ai, True)
-    if not success:
+    report = od.audit(ai, "EN")
+    if report:
         print("{} : {}".format(ai['title'], report))
-print("Audit: {} services".format(len(auditItems)))
-
+print("Audit: {} services".format(len(auditItems))) 
 
 # Update an item
 # This sample grabs the first item in the given folder and simply touches it. The modified date on Portal is updated.
@@ -103,3 +103,19 @@ anItem = foldItems[0]
 print("item: {}, created: {}, modified: {}".format(anItem.title, od.convertDate(anItem.created), od.convertDate(anItem.modified)))
 updatedItem = od.touchUpdate(anItem)
 print(updatedItem)
+
+# French items were found to have been shared to the OD_Data_EN (english) group.
+# These items need to be unshared from the English group and Shared to the French group.
+# They can be identified by lookin at ALL content in the OD_Data_EN group, then look at
+#  the folder they live in. If they live in the FRENCH folder, then we know they must be moved
+# Note - the true AGOL IDs have been replaced below. Group.ID and Folder.ID are required
+# en folder:  12345fgh - not used
+# en group:   abcdefg456
+# fr folder:  qwert0987
+# fr group:   zzzz123
+wrong = od.listItemsByGroup("OD_Data_EN")
+for w in wrong.content():
+    if w['ownerFolder'] == "qwert0987":
+        print(w['title'])
+        w.unshare(groups="abcdefg456")
+        w.share(groups="zzzz123")

@@ -65,40 +65,47 @@ class ODManager(object):
 
         return None
 
-    def audit(self, agolitem, strict=False):
+    def audit(self, agolitem, lang="EN"):
 
-        doesPass = True
+        enLicense = "URL TO LICENSE"
+        frLicense = "URL TO LICENSE"
+        enTags = ["environment", "transportation", "parks", "infrastructure", "health", "local gov", "business", "geospatial"]
+        frTags = ["environnement", "transport", "parcs", "infrastructure", "santé", "administration municipale", "affaires", "géospatial"]
+        
         report = {}
-        if strict:
-            if not agolitem['title']:
-                doesPass = False 
-                report['title'] =agolitem['title']
-            if not agolitem['description']:
-                doesPass = False 
-                report['desctiption'] = agolitem['description']
-            if not agolitem['thumbnail']:
-                doesPass = False 
-                report['thumbnail'] = agolitem['thumbnail']
-            if not agolitem['licenseInfo']:
-                doesPass = False 
-                report['liceseInfo'] = agolitem['licenseInfo']
-            if not agolitem['typeKeywords']:
-                doesPass = False 
-                report['typeKeywords'] = agolitem['typeKeywords']
-            if not agolitem['tags']:
-                doesPass = False
-                report['tags'] = agolitem['tags']
-            if not agolitem['accessInformation']:
-                doesPass = False 
-                report['accessInfo'] = agolitem['accessInformation']
-            if not agolitem['access']:
-                doesPass = False 
-                report['access'] = agolitem['access']
-            #if not agolitem['groupDesignations']:
-            #    doesPass = False
-            #    report['groups'] = None
 
-        return doesPass, report
+        if lang == "EN":
+            if agolitem['licenseInfo'] != enLicense:                
+                report['liceseInfo'] = agolitem['licenseInfo']
+            if not set([i.lower() for i in agolitem['tags']]).intersection(enTags):                
+                report['tags'] = agolitem['tags']
+
+        elif lang == "FR":
+            if "NO" in agolitem['title']:                
+                report['title'] =agolitem['title']
+            if agolitem['licenseInfo'] != frLicense:                                
+                report['liceseInfo'] = agolitem['licenseInfo']
+            if not set([i.lower() for i in agolitem['tags']]).intersection(frTags):                
+                report['tags'] = agolitem['tags']
+
+
+        if not agolitem['title']:            
+            report['title'] =agolitem['title']
+        if not agolitem['description']:            
+            report['desctiption'] = agolitem['description']
+        if not agolitem['thumbnail']:            
+            report['thumbnail'] = agolitem['thumbnail']
+        if not agolitem['typeKeywords']:            
+            report['typeKeywords'] = agolitem['typeKeywords']
+        if not agolitem['accessInformation']:            
+            report['accessInfo'] = agolitem['accessInformation']
+        if not agolitem['access']:
+            report['access'] = agolitem['access']
+        #if not agolitem['groupDesignations']:
+        #    doesPass = False
+        #    report['groups'] = None
+
+        return report
 
     def touchUpdate(self, agolitem):
         ''' Simply touches an item on portal, forcing the 'updated date' to refresh
