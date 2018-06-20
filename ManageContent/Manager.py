@@ -25,6 +25,13 @@ class ODManager(object):
         #t_utc = datetime.datetime.utcfromtimestamp(float(adate)/1000.)        
         return t.strftime(fmt) 
 
+    def createItem(self, json, data=None, thumbnail=None):
+        ''' Create an item in the portal. Supply JSON that conforms to the required 
+             item spec. Optionally provide data and thumbnail
+        '''
+        
+        add = self.gis.content.add(json, data, thumbnail)
+        return add
 
     def findGroups(self, outputPath=None):
         '''Get all groups owned by the authenticated user and save to csv
