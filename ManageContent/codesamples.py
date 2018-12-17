@@ -1,7 +1,7 @@
 '''
     Code snippets to help manage items in ArGIS.COM/Portal.
     Calls Manager.py  
-    Authenication through the `credentials.ini` file
+    Authentication through the `credentials.ini` file
     Requirements: Python 3+, ArcGIS Python API
     Date: May 30, 2018
 '''
@@ -22,6 +22,7 @@ portal = config['auth']['agol']
 
 od = ODManager(user, pword, portal, localPath)
 
+
 # Get and display all folders
 for f in od.folders:
     print("{} - {}".format(f['title'], f['id']))
@@ -33,6 +34,7 @@ for g in grps:
 
 # Save all the groups from the logged in user to a CSV
 csv = od.findGroups(localPath)
+
 
 # List all the items in a folder
 foldItems = od.listItemsByFolder("Unnecessary")
@@ -74,6 +76,7 @@ fitems = od.listItemsByFolder("Data_EN")
 print("{} items in group: {}".format(len(gitems.content()), "OD_Data_EN"))
 print("{} items in folder: {}".format(len(fitems), "Data_EN"))
 
+
 # Find and report items that exist in the Public groups, but are not shared publicly.
 # IE. An item should not be shared to the group until its ready to go public. Why is it there?
 gitems = od.listItemsByGroup("OD_Data_FR")
@@ -84,6 +87,7 @@ for itm in gcontent:
     if itm.access != "public":
         print("  {} : {}".format(itm.title, itm.access))    
 
+
 # Perform a metadata audit by all items in a folder.
 # If the item does not have a value, its report as a failure.
 auditItems = od.listItemsByFolder("Ready_EN")
@@ -92,6 +96,7 @@ for ai in auditItems:
     if report:
         print("{} : {}".format(ai['title'], report))
 print("Audit: {} services".format(len(auditItems))) 
+
 
 # Update an item
 # This sample grabs the first item in the given folder and simply touches it. The modified date on Portal is updated.
@@ -103,6 +108,7 @@ anItem = foldItems[0]
 print("item: {}, created: {}, modified: {}".format(anItem.title, od.convertDate(anItem.created), od.convertDate(anItem.modified)))
 updatedItem = od.touchUpdate(anItem)
 print(updatedItem)
+
 
 # French items were found to have been shared to the OD_Data_EN (english) group.
 # These items need to be unshared from the English group and Shared to the French group.
@@ -119,6 +125,7 @@ for w in wrong.content():
         print(w['title'])
         w.unshare(groups="abcdefg456")
         w.share(groups="zzzz123")
+
 
 # Move all the items in the "Ready" folder to the final home of Open Data
 # Also share items live to the public

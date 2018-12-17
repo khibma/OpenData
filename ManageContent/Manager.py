@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from arcgis.gis import GIS
 #from arcgis.gis import server
 import configparser
@@ -25,13 +26,6 @@ class ODManager(object):
         #t_utc = datetime.datetime.utcfromtimestamp(float(adate)/1000.)        
         return t.strftime(fmt) 
 
-    def createItem(self, json, data=None, thumbnail=None):
-        ''' Create an item in the portal. Supply JSON that conforms to the required 
-             item spec. Optionally provide data and thumbnail
-        '''
-        
-        add = self.gis.content.add(json, data, thumbnail)
-        return add
 
     def findGroups(self, outputPath=None):
         '''Get all groups owned by the authenticated user and save to csv
@@ -74,15 +68,22 @@ class ODManager(object):
 
     def audit(self, agolitem, lang="EN"):
 
+        def _fixExtent(ai):
+            ext = [[-76.3555907112863, 44.9616839016198], [-75.2466242192526, 45.5371104704101]]
+            update = ai.update(item_properties={'extent': ext})
+            return update
+
         enLicense = "URL TO LICENSE"
         frLicense = "URL TO LICENSE"
         enTags = ["environment", "transportation", "parks", "infrastructure", "health", "local gov", "business", "geospatial"]
         frTags = ["environnement", "transport", "parcs", "infrastructure", "santé", "administration municipale", "affaires", "géospatial"]
-        
+
         report = {}
 
+        if agolitem.access == "private": return
+
         if lang == "EN":
-            if agolitem['licenseInfo'] != enLicense:                
+            if enLicense not in agolitem['licenseInfo']:                
                 report['liceseInfo'] = agolitem['licenseInfo']
             if not set([i.lower() for i in agolitem['tags']]).intersection(enTags):                
                 report['tags'] = agolitem['tags']
@@ -90,11 +91,17 @@ class ODManager(object):
         elif lang == "FR":
             if "NO" in agolitem['title']:                
                 report['title'] =agolitem['title']
-            if agolitem['licenseInfo'] != frLicense:                                
+            if frLicense not in agolitem['licenseInfo']:                                     
                 report['liceseInfo'] = agolitem['licenseInfo']
             if not set([i.lower() for i in agolitem['tags']]).intersection(frTags):                
                 report['tags'] = agolitem['tags']
 
+        if not agolitem['extent']:
+            u = _fixExtent(agolitem)
+            if not u:
+                report['extent'] = "No extent set"
+            else:
+                print("INFO: Fixed extent for {}".format(agolitem['title']))
 
         if not agolitem['title']:            
             report['title'] =agolitem['title']
@@ -112,13 +119,26 @@ class ODManager(object):
         #    doesPass = False
         #    report['groups'] = None
 
+        if len(report) > 0:
+            report['url'] = agolitem.homepage
+
         return report
+
+    def setTableThumbnail(self, agolitem):
+        tableThumb = r"c:\path2Table\table.png"
+
+        if agolitem.type in ['Microsoft Excel', 'CSV'] or "Table" in agolitem.typeKeywords:
+            if agolitem.thumbnail != 'thumbnail/table.png':
+                print("Updating thumbnail of {}".format(agolitem.title))
+                update = agolitem.update(thumbnail=tableThumb)
+                print(update)
+
+        return
 
     def touchUpdate(self, agolitem):
         ''' Simply touches an item on portal, forcing the 'updated date' to refresh
             This function could be enhanced to accept a metadata payload for metadata edits
          '''
-
         result = agolitem.update()
 
         return result
